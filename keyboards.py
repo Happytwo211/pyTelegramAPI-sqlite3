@@ -156,16 +156,16 @@ def stars_hotel():
 def dinner_quantity():
     dinner_quantity = types.InlineKeyboardMarkup()
     dinner_quantity_button_1 = types.InlineKeyboardButton(
-        'Все включено', callback_data='all_inclusive'
+        'Все включено', callback_data='Все включено'
     )
     dinner_quantity_button_2 = types.InlineKeyboardButton(
-        'Завтрак', callback_data='breakfast'
+        'Завтрак', callback_data='Завтрак'
     )
     dinner_quantity_button_3 = types.InlineKeyboardButton(
-        'Завтрак и ужин', callback_data='br_and_dinner'
+        'Завтрак и ужин', callback_data='Завтрак и ужин'
     )
     dinner_quantity_button_4 = types.InlineKeyboardButton(
-        'Завтрак, обед и ужин', callback_data='every_food'
+        'Завтрак, обед и ужин', callback_data='Завтрак, обед и ужин'
     )
     dinner_quantity_button_5 = types.InlineKeyboardButton(
         'Назад', callback_data='main_menu_dinner'
@@ -215,3 +215,36 @@ def peiod():
     period.add(period_button_1,period_button_2,period_button_3,
                period_button_4,period_button_5, period_button_6)
     return period
+
+def yes_or_no_keyboard():
+    kb = types.InlineKeyboardMarkup()
+    kb_button_1 = types.InlineKeyboardButton(
+        'Данные верны', callback_data='Данные верны'
+    )
+    kb_button_2 = types.InlineKeyboardButton(
+        'Заполнить анкету заного', callback_data='Заполнить заного'
+    )
+    kb.add(kb_button_1, kb_button_2)
+    return kb
+
+def user_contancts():
+    contands_kb = types.InlineKeyboardMarkup(row_width=2)
+    contands_kb_button_1 = types.InlineKeyboardButton(
+        'Telegram', callback_data='telegram'
+    )
+    contands_kb_button_2 = types.InlineKeyboardButton(
+        'WhatsApp', callback_data='whatsapp'
+    )
+    contands_kb_button_3 = types.InlineKeyboardButton(
+        'По номеру телефона', callback_data='number'
+    )
+    contands_kb.add(contands_kb_button_1, contands_kb_button_2, contands_kb_button_3)
+    return contands_kb
+
+def get_phone():
+    kb_phone = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    kb_phone_button_1 = types.KeyboardButton(
+        text='Поделиться номером телефона?', request_contact=True
+    )
+    kb_phone.add(kb_phone_button_1)
+    return kb_phone

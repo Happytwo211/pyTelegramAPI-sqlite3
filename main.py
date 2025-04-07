@@ -93,6 +93,7 @@ def handle_adult_tourist(call):
         call.message.chat.id, call.message.message_id, reply_markup=kids_tourists()
 
     )
+    global adult_persons
     adult_persons = call.data
     user_data.append(f'Количество взрослых - {adult_persons}')
     return adult_persons
@@ -119,6 +120,7 @@ def handle_adult_tourist(call):
         call.message.chat.id, call.message.message_id, reply_markup=stars_hotel()
 
     )
+    global children
     children = call.data
     user_data.append(f'Количесвто детей - {children}')
     return children
@@ -143,6 +145,7 @@ def handle_adult_tourist(call):
         call.message.chat.id, call.message.message_id, reply_markup=dinner_quantity()
 
     )
+    global stars
     stars = call.data
     user_data.append(f'Количесвто звезд - {stars}')
     return stars
@@ -169,6 +172,7 @@ def handle_days_long(call):
         call.message.chat.id, call.message.message_id, reply_markup=days_long()
 
     )
+    global eat_plan
     eat_plan = call.data
     user_data.append(f'План питания -{eat_plan}')
     return eat_plan
@@ -194,6 +198,7 @@ def handle_days_long(call):
         call.message.chat.id, call.message.message_id, reply_markup=peiod()
 
     )
+    global days
     days = call.data
     user_data.append(f'Количесвто дней -{days}')
     return days
@@ -221,6 +226,7 @@ def handle_days_long(call):
 
     )
 
+    global peiod_
     peiod_= call.data
     user_data.append(f'Период отдыха - {peiod_}')
 
@@ -229,15 +235,6 @@ def handle_days_long(call):
     for data in user_data:
         bot.send_message(message.chat.id, f'{data}')
 
-    #TEST IS OK#
-    cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
-                   'adult_persons, children, start, eat_plan, days, period) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (user_name ,departure_city,arrive_city ,
-                                                                                                                  'test2','test2','test2',
-                                                                                                                  'test','test', peiod_))
-    connection.commit()
-
-    # global user_db_data
-    # user_db_data = user_data[:]
     user_data.clear()
 
     bot.send_message(message.chat.id, f'Данные верны?', reply_markup=yes_or_no_keyboard())
@@ -299,19 +296,42 @@ def telegram(call):
 
     bot.register_next_step_handler(msg, phone_number)
 def phone_number(message):
+    phone_number_ = message.contact.phone_number
     bot.send_message(message.chat.id, f'Скоро с вами свяжется специалист по номеру '
-                                      f'\n{message.contact.phone_number}')
+                                      f'\n{phone_number_}')
+    cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                   'adult_persons, children, stars, eat_plan, days, period, user_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                   (user_name, departure_city, arrive_city,
+                    adult_persons, children, stars,
+                    eat_plan, days, peiod_, phone_number_))
+    connection.commit()
     # print(message.contact.phone_number)
 def username_tg(message):
-    user_tg_contacts.append(f'Ник в телеграмме - {message.text}')
+    username_tg_ = message.text
+    user_tg_contacts.append(f'Ник в телеграмме - {username_tg_}')
     bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в телеграм '
                                       f'\n ваш аккаунт-<b>{message.text}</b>', parse_mode='HTML')
+
+    cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                   'adult_persons, children, stars, eat_plan, days, period, user_tg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                   (user_name, departure_city, arrive_city,
+                    adult_persons, children, stars,
+                    eat_plan, days, peiod_, username_tg_ ))
+    connection.commit()
+
     user_tg_contacts.clear()
 
 def username_whatsapp(message):
-    user_tg_contacts.append(f'Ник в whatsapp - {message.text}')
+    username_whatsapp_ = message.text
+    user_tg_contacts.append(f'Ник в whatsapp - {username_whatsapp_}')
     bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в whatsapp'
                                       f'\nваш аккаунт-<b>{message.text}</b>', parse_mode='HTML')
+    cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                   'adult_persons, children, stars, eat_plan, days, period, user_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                   (user_name, departure_city, arrive_city,
+                    adult_persons, children, stars,
+                    eat_plan, days, peiod_, username_whatsapp_))
+    connection.commit()
     user_tg_contacts.clear()
 
 

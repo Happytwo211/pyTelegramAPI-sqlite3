@@ -1,5 +1,6 @@
 import telebot
 import sqlite3
+import re
 from keyboards import (start_keyboard, departure_cities_keyboard, arrival_cities_keyboard, adult_tourists, kids_tourists,
                        stars_hotel, dinner_quantity, days_long, peiod, yes_or_no_keyboard,
                        user_contancts, get_phone)
@@ -254,11 +255,13 @@ def handle_days_long(call):
 
 @bot.callback_query_handler(func=lambda call: call.data in ['Данные верны'])
 def correct(call):
+    message = call.message
     global message_id
     message_id = bot.edit_message_text(
         'Как можно с вами связаться?',
         call.message.chat.id, call.message.message_id, reply_markup=user_contancts()
     )
+
 
 @bot.callback_query_handler(func=lambda call: call.data in ['Заполнить заного'])
 def incorrect(call):
@@ -266,7 +269,6 @@ def incorrect(call):
     bot.edit_message_text(f'Привет, {message.from_user.first_name}'
                                       f'\nЭтот бот поможет тебе подобрать тебе тур!', call.message.chat.id, call.message.message_id,
                           reply_markup=start_keyboard())
-
 
 
 user_tg_contacts=[]
@@ -291,12 +293,14 @@ def telegram(call):
 @bot.callback_query_handler(func=lambda call: call.data in ['number'])
 def telegram(call):
     message = call.message
-    msg = bot.send_message(message.chat.id, f'Введите номер телефона'
-                                      f'\nИли поделитесь им через кнопку!', reply_markup=get_phone())
+    msg = bot.send_message(message.chat.id, f'\nПоделитесь номером телефона!', reply_markup=get_phone())
 
     bot.register_next_step_handler(msg, phone_number)
 def phone_number(message):
-    phone_number_ = message.contact.phone_number
+    try:
+        phone_number_ = message.contact.phone_number
+    except AttributeError:
+        phone_number_ = message.text
     bot.send_message(message.chat.id, f'Скоро с вами свяжется специалист по номеру '
                                       f'\n{phone_number_}')
     cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
@@ -305,7 +309,9 @@ def phone_number(message):
                     adult_persons, children, stars,
                     eat_plan, days, peiod_, phone_number_))
     connection.commit()
-    # print(message.contact.phone_number)
+
+
+
 def username_tg(message):
     username_tg_ = message.text
     user_tg_contacts.append(f'Ник в телеграмме - {username_tg_}')

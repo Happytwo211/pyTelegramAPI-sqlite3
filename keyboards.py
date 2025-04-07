@@ -12,6 +12,20 @@ def start_keyboard():
     )
     return start_keyboard
 
+def consult_kb ():
+    consult_kb_ = types.InlineKeyboardMarkup()
+    consult_kb_b_1 = types.InlineKeyboardButton(
+        'По телефону', callback_data='number'
+    )
+    consult_kb_b_2 = types.InlineKeyboardButton(
+        'По телеграмм', callback_data='telegram'
+    )
+    consult_kb_b_3 = types.InlineKeyboardButton(
+        'По whatsapp', callback_data='whatsapp'
+    )
+    consult_kb_.add(consult_kb_b_1,consult_kb_b_2,consult_kb_b_3)
+    return consult_kb_
+
 def departure_cities_keyboard():
     cities_keyboard = types.InlineKeyboardMarkup()
     cities_keyboard_button_1 = types.InlineKeyboardButton(

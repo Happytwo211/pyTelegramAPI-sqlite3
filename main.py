@@ -3,7 +3,7 @@ import sqlite3
 import re
 from keyboards import (start_keyboard, departure_cities_keyboard, arrival_cities_keyboard, adult_tourists, kids_tourists,
                        stars_hotel, dinner_quantity, days_long, peiod, yes_or_no_keyboard,
-                       user_contancts, get_phone)
+                       user_contancts, get_phone, consult_kb)
 from token_ import TOKEN
 
 connection = sqlite3.connect('users_data.sqlite3', check_same_thread=False)
@@ -32,7 +32,14 @@ def handle_callback_get_tour(call):
     bot.send_message(message.chat.id, f'Ваш город вылета?'
                                       f'\n█▒▒▒▒▒▒▒▒▒ 12%', reply_markup=departure_cities_keyboard())
 
+@bot.callback_query_handler(func=lambda call: call.data in ['get_consult'])
+def handle_callback_get_tour(call):
+    message = call.message
+    bot.send_message(message.chat.id, f'Как бы вы хотели получить консультацию?', reply_markup=consult_kb())
 
+# @bot.callback_query_handler(func=lambda call: call.data in ['phone', 'telegram', 'whatsapp'])
+# def handle_callback_consult(call):
+#     pass
 #CALLBACK_DEPARTURE_CITIES
 @bot.callback_query_handler(func=lambda call: call.data in ['Москва', 'Санкт-Петербург', 'Екатеренбург',
                                                             'Новосибирск', 'Казань', 'Другое'])
@@ -284,7 +291,7 @@ def telegram(call):
 
 
 @bot.callback_query_handler(func=lambda call: call.data in ['whatsapp'])
-def telegram(call):
+def whatsapp(call):
     message = call.message
     bot.edit_message_text( f'Отправте свой ник в whatsapp',call.message.chat.id, call.message.message_id)
     bot.register_next_step_handler(message, username_whatsapp)
@@ -303,12 +310,20 @@ def phone_number(message):
         phone_number_ = message.text
     bot.send_message(message.chat.id, f'Скоро с вами свяжется специалист по номеру '
                                       f'\n{phone_number_}')
-    cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
-                   'adult_persons, children, stars, eat_plan, days, period, user_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                   (user_name, departure_city, arrive_city,
-                    adult_persons, children, stars,
-                    eat_plan, days, peiod_, phone_number_))
-    connection.commit()
+    try:
+        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                       'adult_persons, children, stars, eat_plan, days, period, user_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                       (user_name, departure_city, arrive_city,
+                        adult_persons, children, stars,
+                        eat_plan, days, peiod_, phone_number_))
+        connection.commit()
+    except NameError:
+        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                       'adult_persons, children, stars, eat_plan, days, period, user_tg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                       (user_name, 'Консультация', 'Консультация',
+                        'Консультация', 'Консультация', 'Консультация',
+                        'Консультация', 'Консультация', 'Консультация', phone_number_))
+        connection.commit()
 
 
 
@@ -317,13 +332,20 @@ def username_tg(message):
     user_tg_contacts.append(f'Ник в телеграмме - {username_tg_}')
     bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в телеграм '
                                       f'\n ваш аккаунт-<b>{message.text}</b>', parse_mode='HTML')
-
-    cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
-                   'adult_persons, children, stars, eat_plan, days, period, user_tg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                   (user_name, departure_city, arrive_city,
-                    adult_persons, children, stars,
-                    eat_plan, days, peiod_, username_tg_ ))
-    connection.commit()
+    try:
+        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                       'adult_persons, children, stars, eat_plan, days, period, user_tg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                       (user_name, departure_city, arrive_city,
+                        adult_persons, children, stars,
+                        eat_plan, days, peiod_, username_tg_ ))
+        connection.commit()
+    except NameError:
+        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                       'adult_persons, children, stars, eat_plan, days, period, user_tg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                       (user_name, 'Консультация', 'Консультация',
+                        'Консультация', 'Консультация', 'Консультация',
+                        'Консультация', 'Консультация', 'Консультация', username_tg_))
+        connection.commit()
 
     user_tg_contacts.clear()
 
@@ -332,12 +354,20 @@ def username_whatsapp(message):
     user_tg_contacts.append(f'Ник в whatsapp - {username_whatsapp_}')
     bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в whatsapp'
                                       f'\nваш аккаунт-<b>{message.text}</b>', parse_mode='HTML')
-    cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
-                   'adult_persons, children, stars, eat_plan, days, period, user_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                   (user_name, departure_city, arrive_city,
-                    adult_persons, children, stars,
-                    eat_plan, days, peiod_, username_whatsapp_))
-    connection.commit()
+    try:
+        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                       'adult_persons, children, stars, eat_plan, days, period, user_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                       (user_name, departure_city, arrive_city,
+                        adult_persons, children, stars,
+                        eat_plan, days, peiod_, username_whatsapp_))
+        connection.commit()
+    except NameError:
+        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                       'adult_persons, children, stars, eat_plan, days, period, user_tg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                       (user_name, 'Консультация', 'Консультация',
+                        'Консультация', 'Консультация', 'Консультация',
+                        'Консультация', 'Консультация', 'Консультация', username_whatsapp_))
+        connection.commit()
     user_tg_contacts.clear()
 
 

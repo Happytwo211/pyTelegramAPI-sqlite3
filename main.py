@@ -26,6 +26,50 @@ def handle_start(message):
     return user_name
 
 #calldata
+
+@bot.callback_query_handler(func=lambda call: call.data in ['phone_consult'])
+def handle_consult_phone(call):
+    message = call.message
+    bot.send_message(message.chat.id, f'Поделитесь номером телефона и мы свяжемся с вами!',reply_markup= get_phone())
+    bot.register_next_step_handler(message, phone_consult)
+
+def phone_consult(message):
+    try:
+        phone_number_ = message.contact.phone_number
+    except AttributeError:
+        phone_number_ = message.text
+    bot.send_message(message.chat.id, f'Скоро с вами свяжется специалист по номеру '
+                                      f'\n{phone_number_}')
+    cursor.execute('INSERT INTO users_consult (user_name, phone_number) VALUES (?, ?)', (user_name, phone_number_))
+    connection.commit()
+@bot.callback_query_handler(func=lambda call: call.data in ['whatsapp_consult'])
+def handle_whatsapp_consult(call):
+    message = call.message
+    bot.send_message(message.chat.id, f'Напишите ваш ник в whatsapp и мы свяжемся с вами!')
+    bot.register_next_step_handler(message, whatsapp_consult )
+
+def whatsapp_consult(message):
+    username_whatsapp_ = message.text
+    bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в whatsapp'
+                                      f'\nваш аккаунт-<b>{username_whatsapp_}</b>', parse_mode='HTML')
+
+    cursor.execute('INSERT INTO users_consult (user_name, whatsapp) VALUES (?, ?)', (user_name, username_whatsapp_ ))
+    connection.commit()
+
+@bot.callback_query_handler(func=lambda call: call.data in ['telegram_consult'])
+def handle_whatsapp_consult(call):
+    message = call.message
+    bot.send_message(message.chat.id, f'Напишите ваш ник в whatsapp и мы свяжемся с вами!')
+    bot.register_next_step_handler(message, tg_consult )
+
+def tg_consult(message):
+    username_tg_ = message.text
+    bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в whatsapp'
+                                      f'\nваш аккаунт-<b>{username_tg_}</b>', parse_mode='HTML')
+
+    cursor.execute('INSERT INTO users_consult (user_name, telegram) VALUES (?, ?)', (user_name, username_tg_ ))
+    connection.commit()
+
 @bot.callback_query_handler(func=lambda call: call.data in ['get_tour'])
 def handle_callback_get_tour(call):
     message = call.message
@@ -37,9 +81,7 @@ def handle_callback_get_tour(call):
     message = call.message
     bot.send_message(message.chat.id, f'Как бы вы хотели получить консультацию?', reply_markup=consult_kb())
 
-# @bot.callback_query_handler(func=lambda call: call.data in ['phone', 'telegram', 'whatsapp'])
-# def handle_callback_consult(call):
-#     pass
+
 #CALLBACK_DEPARTURE_CITIES
 @bot.callback_query_handler(func=lambda call: call.data in ['Москва', 'Санкт-Петербург', 'Екатеренбург',
                                                             'Новосибирск', 'Казань', 'Другое'])

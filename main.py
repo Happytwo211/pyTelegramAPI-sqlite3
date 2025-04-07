@@ -6,7 +6,7 @@ from keyboards import (start_keyboard, departure_cities_keyboard, arrival_cities
                        user_contancts, get_phone, consult_kb)
 from token_ import TOKEN
 
-connection = sqlite3.connect('users_data.sqlite3', check_same_thread=False)
+connection = sqlite3.connect('data/users_data.sqlite3', check_same_thread=False)
 cursor = connection.cursor()
 
 

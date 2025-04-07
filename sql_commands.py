@@ -1,7 +1,7 @@
 import sqlite3
 
 
-connection = sqlite3.connect('users_data.sqlite3', check_same_thread=False)
+connection = sqlite3.connect('data/users_data.sqlite3', check_same_thread=False)
 cursor = connection.cursor()
 
 #

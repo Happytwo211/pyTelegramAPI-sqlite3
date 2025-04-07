@@ -1,10 +1,13 @@
 import telebot
+import sqlite3
 from keyboards import (start_keyboard, departure_cities_keyboard, arrival_cities_keyboard, adult_tourists, kids_tourists,
                        stars_hotel, dinner_quantity, days_long, peiod, yes_or_no_keyboard,
                        user_contancts, get_phone)
-
-
 from token_ import TOKEN
+
+connection = sqlite3.connect('users_data.sqlite3', check_same_thread=False)
+cursor = connection.cursor()
+
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -14,8 +17,12 @@ user_data = []
 #commands
 @bot.message_handler(commands=['start'])
 def handle_start(message):
+
     bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name}'
                                       f'\nЭтот бот поможет тебе подобрать тебе тур!', reply_markup=start_keyboard())
+    global user_name
+    user_name = message.from_user.first_name
+    return user_name
 
 #calldata
 @bot.callback_query_handler(func=lambda call: call.data in ['get_tour'])
@@ -33,7 +40,10 @@ def handle_callback_cities(call):
         f'В какой стране вы хотите отдохнуть? \n ██▒▒▒▒▒▒▒▒ 25%',
         call.message.chat.id, call.message.message_id, reply_markup=arrival_cities_keyboard()
     )
-    user_data.append(f'Город вылета -{call.data}')
+    global departure_city
+    departure_city = call.data
+    user_data.append(f'Город вылета - {departure_city}')
+    return departure_city
 
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_arrival_cities'])
@@ -58,8 +68,10 @@ def handle_callback_arrival_cities(call):
         call.message.chat.id, call.message.message_id, reply_markup=adult_tourists()
 
     )
-    user_data.append(f'Город прилета  -{call.data}')
-
+    global arrive_city
+    arrive_city = call.data
+    user_data.append(f'Город прилета  -{arrive_city}')
+    return arrive_city
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_adult_tourist'])
 def handle_main_menu_adult_tourist(call):
@@ -81,7 +93,9 @@ def handle_adult_tourist(call):
         call.message.chat.id, call.message.message_id, reply_markup=kids_tourists()
 
     )
-    user_data.append(f'Количество взрослых - {call.data}')
+    adult_persons = call.data
+    user_data.append(f'Количество взрослых - {adult_persons}')
+    return adult_persons
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_kids_tourist'])
 def handle_main_menu_adult_tourist(call):
@@ -105,7 +119,9 @@ def handle_adult_tourist(call):
         call.message.chat.id, call.message.message_id, reply_markup=stars_hotel()
 
     )
-    user_data.append(f'Количесвто детей -{call.data}')
+    children = call.data
+    user_data.append(f'Количесвто детей - {children}')
+    return children
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_stars_hotel'])
 def handle_adult_tourist(call):
@@ -127,7 +143,9 @@ def handle_adult_tourist(call):
         call.message.chat.id, call.message.message_id, reply_markup=dinner_quantity()
 
     )
-    user_data.append(f'Количесвто звезд -{call.data}')
+    stars = call.data
+    user_data.append(f'Количесвто звезд - {stars}')
+    return stars
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_dinner'])
 def handle_adult_tourist(call):
@@ -143,6 +161,7 @@ def handle_adult_tourist(call):
 
 
 #CAllBACK DINERS
+
 @bot.callback_query_handler(func=lambda call: call.data in ['Все включено', 'Завтрак', 'Завтрак и ужин', 'Завтрак, обед и ужин'])
 def handle_days_long(call):
     bot.edit_message_text(
@@ -150,7 +169,9 @@ def handle_days_long(call):
         call.message.chat.id, call.message.message_id, reply_markup=days_long()
 
     )
-    user_data.append(f'План питания -{call.data}')
+    eat_plan = call.data
+    user_data.append(f'План питания -{eat_plan}')
+    return eat_plan
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_days_long'])
 def handle_adult_tourist(call):
@@ -173,7 +194,9 @@ def handle_days_long(call):
         call.message.chat.id, call.message.message_id, reply_markup=peiod()
 
     )
-    user_data.append(f'Количесвто дней -{call.data}')
+    days = call.data
+    user_data.append(f'Количесвто дней -{days}')
+    return days
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_days_long'])
 def handle_days_long(call):
@@ -198,18 +221,27 @@ def handle_days_long(call):
 
     )
 
-    user_data.append(f'Период отдыха - {call.data}')
-    print(user_data)
+    peiod_= call.data
+    user_data.append(f'Период отдыха - {peiod_}')
+
 
     message = call.message
     for data in user_data:
         bot.send_message(message.chat.id, f'{data}')
 
+    #TEST IS OK#
+    cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                   'adult_persons, children, start, eat_plan, days, period) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (user_name ,departure_city,arrive_city ,
+                                                                                                                  'test2','test2','test2',
+                                                                                                                  'test','test', peiod_))
+    connection.commit()
+
+    # global user_db_data
+    # user_db_data = user_data[:]
     user_data.clear()
-    print(user_data)
 
     bot.send_message(message.chat.id, f'Данные верны?', reply_markup=yes_or_no_keyboard())
-
+    return peiod_
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_period'])
 def handle_days_long(call):
     bot.edit_message_text(
@@ -229,7 +261,6 @@ def correct(call):
     message_id = bot.edit_message_text(
         'Как можно с вами связаться?',
         call.message.chat.id, call.message.message_id, reply_markup=user_contancts()
-
     )
 
 @bot.callback_query_handler(func=lambda call: call.data in ['Заполнить заного'])
@@ -252,6 +283,7 @@ def telegram(call):
 
 
 
+
 @bot.callback_query_handler(func=lambda call: call.data in ['whatsapp'])
 def telegram(call):
     message = call.message
@@ -263,7 +295,7 @@ def telegram(call):
 def telegram(call):
     message = call.message
     msg = bot.send_message(message.chat.id, f'Введите номер телефона'
-                                      f'\nИли поделитесь им через кнопку!',reply_markup=get_phone())
+                                      f'\nИли поделитесь им через кнопку!', reply_markup=get_phone())
 
     bot.register_next_step_handler(msg, phone_number)
 def phone_number(message):
@@ -281,6 +313,11 @@ def username_whatsapp(message):
     bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в whatsapp'
                                       f'\nваш аккаунт-<b>{message.text}</b>', parse_mode='HTML')
     user_tg_contacts.clear()
+
+
+# connection.commit()
+# connection.close()
+
 
 if __name__ == "__main__":
     bot.polling(none_stop=True)

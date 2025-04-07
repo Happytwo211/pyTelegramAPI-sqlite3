@@ -6,7 +6,7 @@ from keyboards import (start_keyboard, departure_cities_keyboard, arrival_cities
                        user_contancts, get_phone, consult_kb)
 from token_ import TOKEN
 
-connection = sqlite3.connect('data/users_data.sqlite3', check_same_thread=False)
+connection = sqlite3.connect('db3.sqlite3', check_same_thread=False)
 cursor = connection.cursor()
 
 
@@ -25,6 +25,17 @@ def handle_start(message):
     user_name = message.from_user.first_name
     return user_name
 
+@bot.message_handler(commands=['db'])
+def handle_db(message):
+    cursor.execute('''
+    SELECT * FROM users_data
+    ''')
+    data = cursor.fetchall()
+    for i in data:
+        bot.send_message(message.chat.id, f'Привет, \n{i}')
+    global user_name
+    user_name = message.from_user.first_name
+    return user_name
 #calldata
 
 @bot.callback_query_handler(func=lambda call: call.data in ['phone_consult'])

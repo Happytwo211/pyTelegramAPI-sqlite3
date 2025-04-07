@@ -15,13 +15,13 @@ def start_keyboard():
 def consult_kb ():
     consult_kb_ = types.InlineKeyboardMarkup()
     consult_kb_b_1 = types.InlineKeyboardButton(
-        'По телефону', callback_data='number'
+        'По телефону', callback_data='phone_consult'
     )
     consult_kb_b_2 = types.InlineKeyboardButton(
-        'По телеграмм', callback_data='telegram'
+        'По телеграмм', callback_data='telegram_consult'
     )
     consult_kb_b_3 = types.InlineKeyboardButton(
-        'По whatsapp', callback_data='whatsapp'
+        'По whatsapp', callback_data='whatsapp_consult'
     )
     consult_kb_.add(consult_kb_b_1,consult_kb_b_2,consult_kb_b_3)
     return consult_kb_

@@ -236,7 +236,7 @@ def yes_or_no_keyboard():
         'Данные верны', callback_data='Данные верны'
     )
     kb_button_2 = types.InlineKeyboardButton(
-        'Заполнить анкету заного', callback_data='Заполнить заного'
+        'Заполнить заново', callback_data='Заполнить заного'
     )
     kb.add(kb_button_1, kb_button_2)
     return kb
@@ -255,7 +255,7 @@ def user_contancts():
     contands_kb.add(contands_kb_button_1, contands_kb_button_2, contands_kb_button_3)
     return contands_kb
 
-def get_phone():
+def     get_phone():
     kb_phone = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     kb_phone_button_1 = types.KeyboardButton(
         text='Поделиться номером телефона?', request_contact=True

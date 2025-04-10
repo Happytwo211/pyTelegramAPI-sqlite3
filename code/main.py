@@ -17,7 +17,7 @@ user_data = []
 
 
 #commands
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['help', 'start'])
 def handle_start(message):
 
     bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name}'
@@ -37,14 +37,16 @@ def handle_db(message):
             if data:
                 bot.send_message(message.chat.id, f'<b>Данные из основной базы данных!</b>\n\n', parse_mode='HTML')
                 for i in data:
-                    bot.send_message(message.chat.id, f'Имя пользователя - {i[0]},'
+                    bot.send_message(message.chat.id, f'Телеграм пользователя - {i[0]},'
                                                       f'\nГород вылета - {i[1]},'
                                                       f'\nКоличество взрослых - {i[2]},'
                                                       f'\nКоличесвто детей - {i[3]},'
                                                       f'\nКоличесвто звезд - {i[4]},'
                                                       f'\nТип питания - {i[5]},'
                                                       f'\nКоличесвто ночей - {i[6]},'
-                                                      f'\nПериод отдыха - {i[7]}')
+                                                      f'\nПериод отдыха - {i[7]}'
+                                                      f'\nТелефон-{i[11]}')
+
             else:
                 bot.send_message(message.chat.id, f'База данных пуста!')
 
@@ -65,9 +67,9 @@ def handle_db(message):
             if data:
                 bot.send_message(message.chat.id, f'Данные из базы данных по консультации\n\n')
                 for i in data:
-                    bot.send_message(message.chat.id, f'Имя пользователя - {i[0]},'
-                                                      f'\nTelegram пользователя - {i[1]},'
-                                                      f'\nТелефон пользователя - {i[2]}')
+                    bot.send_message(message.chat.id,
+                                                 f'\nTelegram пользователя - {i[2]},'
+                                                      f'\nТелефон пользователя - {i[3]}')
             else:
                 bot.send_message(message.chat.id, f'База данных пуста!')
         except sqlite3.OperationalError:
@@ -216,7 +218,7 @@ def delete_consult_DB(message):
 @bot.callback_query_handler(func=lambda call: call.data in ['phone_consult'])
 def handle_consult_phone(call):
     message = call.message
-    bot.send_message(message.chat.id, f'Поделитесь номером телефона и мы свяжемся с вами!',reply_markup= get_phone())
+    bot.send_message(message.chat.id, f'Поделитесь номером телефона и мы свяжемся с вами!', reply_markup= get_phone())
     bot.register_next_step_handler(message, phone_consult)
 
 def phone_consult(message):
@@ -236,12 +238,13 @@ def phone_consult(message):
 @bot.callback_query_handler(func=lambda call: call.data in ['telegram_consult'])
 def handle_tg_consult(call):
     message = call.message
-    username_tg_ = message.from_user.first_name
-    bot.edit_message_text(f'<strong>Специалист свяжется с вами в ближайшее время в telegram</strong>',
-                          call.message.chat.id, call.message.message_id, parse_mode='HTML')
+    username_tg_ = user_name
+
     try:
         cursor.execute('INSERT INTO users_consult (user_name, telegram) VALUES (?, ?)', (user_name, username_tg_))
         connection.commit()
+        bot.edit_message_text(f'<strong>Специалист свяжется с вами в ближайшее время в telegram</strong>',
+                              call.message.chat.id, call.message.message_id, parse_mode='HTML')
     except NameError:
         bot.send_message(message.chat.id, f'Произишла ошибка')
 

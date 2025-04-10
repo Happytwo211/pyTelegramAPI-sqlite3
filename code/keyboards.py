@@ -20,10 +20,7 @@ def consult_kb ():
     consult_kb_b_2 = types.InlineKeyboardButton(
         'По телеграмм', callback_data='telegram_consult'
     )
-    consult_kb_b_3 = types.InlineKeyboardButton(
-        'По whatsapp', callback_data='whatsapp_consult'
-    )
-    consult_kb_.add(consult_kb_b_1,consult_kb_b_2,consult_kb_b_3)
+    consult_kb_.add(consult_kb_b_1,consult_kb_b_2)
     return consult_kb_
 
 def departure_cities_keyboard():
@@ -208,26 +205,44 @@ def days_long():
 
 def peiod():
     period = types.InlineKeyboardMarkup()
-    period_button_1 = types.InlineKeyboardButton(
-        'Январь-февраль', callback_data='янв-фев'
+    period_b_1 = types.InlineKeyboardButton(
+        'Январь', callback_data='Январь'
     )
-    period_button_2 = types.InlineKeyboardButton(
-        'Март-Май', callback_data='март-май'
+    period_b_2 = types.InlineKeyboardButton(
+        'Февраль', callback_data='Февраль'
     )
-    period_button_3 = types.InlineKeyboardButton(
-        'Июнь-август', callback_data='июнь-август'
+    period_b_3 = types.InlineKeyboardButton(
+        'Март', callback_data='Март'
     )
-    period_button_4 = types.InlineKeyboardButton(
-        'Сентябрь-октябрь', callback_data='сент-окт'
+    period_b_4 = types.InlineKeyboardButton(
+        'Апрель', callback_data='Апрель'
     )
-    period_button_5 = types.InlineKeyboardButton(
-        'Ноябрь-Декабрь', callback_data='ноябрь-дек'
+    period_b_5 = types.InlineKeyboardButton(
+        'Май', callback_data='Май'
     )
-    period_button_6 = types.InlineKeyboardButton(
-        'Назад', callback_data='main_menu_period'
+    period_b_6 = types.InlineKeyboardButton(
+        'Июнь', callback_data='Июнь'
     )
-    period.add(period_button_1,period_button_2,period_button_3,
-               period_button_4,period_button_5, period_button_6)
+    period_b_7 = types.InlineKeyboardButton(
+        'Июль', callback_data='Июль'
+    )
+    period_b_8 = types.InlineKeyboardButton(
+        'Август', callback_data='Август'
+    )
+    period_b_9 = types.InlineKeyboardButton(
+        'Сентябрь', callback_data='Сентябрь'
+    )
+    period_b_10 = types.InlineKeyboardButton(
+        'Октябрь', callback_data='Октябрь'
+    )
+    period_b_11 = types.InlineKeyboardButton(
+        'Ноябрь', callback_data='Ноябрь'
+    )
+    period_b_12 = types.InlineKeyboardButton(
+        'Декабрь', callback_data='Декабрь'
+    )
+    period.add(period_b_1,period_b_2,period_b_3,period_b_4,period_b_5,
+               period_b_6,period_b_7,period_b_8,period_b_9,period_b_10,period_b_11,period_b_12)
     return period
 
 def yes_or_no_keyboard():
@@ -247,12 +262,9 @@ def user_contancts():
         'Telegram', callback_data='telegram'
     )
     contands_kb_button_2 = types.InlineKeyboardButton(
-        'WhatsApp', callback_data='whatsapp'
-    )
-    contands_kb_button_3 = types.InlineKeyboardButton(
         'По номеру телефона', callback_data='number'
     )
-    contands_kb.add(contands_kb_button_1, contands_kb_button_2, contands_kb_button_3)
+    contands_kb.add(contands_kb_button_1, contands_kb_button_2)
     return contands_kb
 
 def     get_phone():

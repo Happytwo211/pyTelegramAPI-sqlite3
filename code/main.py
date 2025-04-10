@@ -1,6 +1,5 @@
 import telebot
 from docx import Document
-from docx.shared import Inches
 import sqlite3
 from keyboards import (start_keyboard, departure_cities_keyboard, arrival_cities_keyboard, adult_tourists, kids_tourists,
                             stars_hotel, dinner_quantity, days_long, peiod, yes_or_no_keyboard,
@@ -43,8 +42,8 @@ def handle_db(message):
                                                       f'\nКоличество взрослых - {i[2]},'
                                                       f'\nКоличесвто детей - {i[3]},'
                                                       f'\nКоличесвто звезд - {i[4]},'
-                                                      f'\nПлан питания - {i[5]},'
-                                                      f'\nКоличесвто дней - {i[6]},'
+                                                      f'\nТип питания - {i[5]},'
+                                                      f'\nКоличесвто ночей - {i[6]},'
                                                       f'\nПериод отдыха - {i[7]}')
             else:
                 bot.send_message(message.chat.id, f'База данных пуста!')
@@ -67,9 +66,8 @@ def handle_db(message):
                 bot.send_message(message.chat.id, f'Данные из базы данных по консультации\n\n')
                 for i in data:
                     bot.send_message(message.chat.id, f'Имя пользователя - {i[0]},'
-                                                      f'\nWhatsApp пользователя - {i[1]}'
-                                                      f'\nTelegram пользователя - {i[2]},'
-                                                      f'\nТелефон пользователя - {i[3]}')
+                                                      f'\nTelegram пользователя - {i[1]},'
+                                                      f'\nТелефон пользователя - {i[2]}')
             else:
                 bot.send_message(message.chat.id, f'База данных пуста!')
         except sqlite3.OperationalError:
@@ -102,43 +100,105 @@ def delete_DB(message):
 @bot.message_handler(commands=['db_consult_clear'])
 def handle_db(message):
     if message.from_user.id == 816710725 or message.from_user.id == 1251616169:
+        bot.send_message(message.chat.id, f'Вы уверены, что хотите удалить БД консультаций?')
         bot.register_next_step_handler(message, delete_consult_DB)
     else:
         bot.send_message(message.chat.id, f'У вас нет доступа к этой команде')
 @bot.message_handler(commands=['db_backup'])
 def hanlde_backup(message):
-    pass
-    # try:
-    #     # Извлекаем данные из базы данных
-    #     cursor.execute('SELECT * FROM users_data WHERE user_tg = ?', (username_tg_,))
-    #     rows = cursor.fetchall()
-    #
-    #     # Создаем новый документ Word
-    #     document = Document()
-    #
-    #     # Добавляем заголовки таблицы
-    #     table = document.add_table(rows=1, cols=len(rows[0]))
-    #     hdr_cells = table.rows[0].cells
-    #     for i, col_header in enumerate(['user_name', 'departure_city', 'arrive_city',
-    #                                     'adult_persons', 'children', 'stars',
-    #                                     'eat_plan', 'days', 'period', 'user_tg', 'user_whatsapp', 'user_phone']):
-    #         hdr_cells[i].text = col_header
-    #
-    #     # Заполняем таблицу данными
-    #     for row in rows:
-    #         cells = table.add_row().cells
-    #         for j, cell_value in enumerate(row):
-    #             cells[j].text = str(cell_value)
-    #
-    #     # Сохраняем документ
-    #     document.save(r'C:\Users\thsim\Documents\output.docx')
-    #
-    #     # Сообщаем пользователю о сохранении данных
-    #     bot.send_message(message.chat.id, 'Данные сохранены в файл output.docx.')
-    # except Exception as e:
-    #
-    #     bot.send_message(message.chat.id, f'Произошла ошибка: {e}')
+    if message.from_user.id == 816710725 or message.from_user.id == 1251616169:
+        name = 'backup'
+        name_count = 0
+        document = Document()
+        try:
+            # Извлекаем данные из базы данных
+            cursor.execute('SELECT * FROM users_data')
+            rows = cursor.fetchall()
+            # Создаем новый документ Word
+            # Добавляем заголовки таблицы
+            table = document.add_table(rows=1, cols=len(rows[0]))
+            hdr_cells = table.rows[0].cells
+            for i, col_header in enumerate(['user_name', 'departure_city', 'arrive_city',
+                                            'adult_persons', 'children', 'stars',
+                                            'eat_plan', 'days', 'period', 'user_tg', 'user_phone']):
+                hdr_cells[i].text = col_header
 
+            # Заполняем таблицу данными
+            for row in rows:
+                cells = table.add_row().cells
+                for j, cell_value in enumerate(row):
+                    cells[j].text = str(cell_value)
+
+
+        except Exception as e:
+
+            bot.send_message(message.chat.id, f'Произошла ошибка: {e}')
+        try:
+            # Сохраняем документ
+            # document.save(fr'C:\Users\thsim\Documents\{name}.docx')
+            document.save(f'../data/{name}.docx')
+            # Сообщаем пользователю о сохранении данных
+            bot.send_message(message.chat.id, f'Данные сохранены в файл {name}.docx.')
+
+        except PermissionError:
+
+            name_count = name_count + 1
+            '_'.join(f'{name}')
+            print(name)
+            document.save(fr'C:\Users\thsim\Documents\{name}.docx')
+            return name_count
+
+        except Exception as e:
+            bot.send_message(message.chat.id, f'Произошла ошибка: {e}')
+
+    else:
+        bot.send_message(message.chat.id, f'У вас нет доступа к этой команде')
+
+@bot.message_handler(commands=['db_consult_backup'])
+def hanlde_backup(message):
+    if message.from_user.id == 816710725 or message.from_user.id == 1251616169:
+        name = 'backup_consult'
+        name_count = 0
+        document = Document()
+        try:
+            # Извлекаем данные из базы данных
+            cursor.execute('SELECT * FROM users_consult')
+            rows = cursor.fetchall()
+            # Создаем новый документ Word
+            document = Document()
+            # Добавляем заголовки таблицы
+            table = document.add_table(rows=1, cols=len(rows[0]))
+            hdr_cells = table.rows[0].cells
+            for i, col_header in enumerate(['user_name', 'telegram', 'phone_number']):
+                hdr_cells[i].text = col_header
+
+            # Заполняем таблицу данными
+            for row in rows:
+                cells = table.add_row().cells
+                for j, cell_value in enumerate(row):
+                    cells[j].text = str(cell_value)
+
+        except Exception as e:
+            bot.send_message(message.chat.id, f'Произошла ошибка: {e}')
+        try:
+            # Сохраняем документ
+            # document.save(fr'C:\Users\thsim\Documents\{name}.docx')
+            document.save(f'../data/{name}.docx')
+            # Сообщаем пользователю о сохранении данных
+            bot.send_message(message.chat.id, f'Данные сохранены в файл {name}.docx.')
+
+        except PermissionError:
+
+            name_count = name_count + 1
+            '_'.join(f'{name}')
+            print(name)
+            document.save(fr'C:\Users\thsim\Documents\{name}.docx')
+            return name_count
+
+        except Exception as e:
+            bot.send_message(message.chat.id, f'Произошла ошибка: {e}')
+    else:
+        bot.send_message(message.chat.id, f'У вас нет доступа к этой команде')
 #calldata
 def delete_consult_DB(message):
     if message.text.lower() == 'да':
@@ -171,38 +231,20 @@ def phone_consult(message):
         connection.commit()
     except NameError:
         bot.send_message(message.chat.id, f'Произошла ошибка')
-@bot.callback_query_handler(func=lambda call: call.data in ['whatsapp_consult'])
-def handle_whatsapp_consult(call):
-    message = call.message
-    bot.send_message(message.chat.id, f'Напишите ваш ник в whatsapp и мы свяжемся с вами!')
-    bot.register_next_step_handler(message, whatsapp_consult )
 
-def whatsapp_consult(message):
-    username_whatsapp_ = message.text
-    bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в whatsapp'
-                                      f'\nваш аккаунт-<b>{username_whatsapp_}</b>', parse_mode='HTML')
-
-    try:
-        cursor.execute('INSERT INTO users_consult (user_name, whatsapp) VALUES (?, ?)', (user_name, username_whatsapp_ ))
-        connection.commit()
-    except NameError:
-        bot.send_message(message.chat.id, f'Произишла ошибка!')
 
 @bot.callback_query_handler(func=lambda call: call.data in ['telegram_consult'])
-def handle_whatsapp_consult(call):
+def handle_tg_consult(call):
     message = call.message
-    bot.send_message(message.chat.id, f'Напишите ваш ник в whatsapp и мы свяжемся с вами!')
-    bot.register_next_step_handler(message, tg_consult)
-
-def tg_consult(message):
-    username_tg_ = message.text
-    bot.send_message(message.chat.id, f'Специалист свяжется с вами в ближайшее время в whatsapp'
-                                      f'\nваш аккаунт-<b>{username_tg_}</b>', parse_mode='HTML')
+    username_tg_ = message.from_user.first_name
+    bot.edit_message_text(f'<strong>Специалист свяжется с вами в ближайшее время в telegram</strong>',
+                          call.message.chat.id, call.message.message_id, parse_mode='HTML')
     try:
-        cursor.execute('INSERT INTO users_consult (user_name, telegram) VALUES (?, ?)', (user_name, username_tg_ ))
+        cursor.execute('INSERT INTO users_consult (user_name, telegram) VALUES (?, ?)', (user_name, username_tg_))
         connection.commit()
     except NameError:
         bot.send_message(message.chat.id, f'Произишла ошибка')
+
 
 @bot.callback_query_handler(func=lambda call: call.data in ['get_tour'])
 def handle_callback_get_tour(call):
@@ -325,7 +367,7 @@ def handle_adult_tourist(call):
 @bot.callback_query_handler(func=lambda call: call.data in ['⭐️', '⭐️⭐️', '⭐️⭐️⭐️', '⭐️⭐️⭐️⭐️', '⭐️⭐️⭐️⭐️⭐️'])
 def handle_adult_tourist(call):
     bot.edit_message_text(
-        'Выберите план питания \n███████▒▒▒ 75%',
+        'Выберите тип питания \n███████▒▒▒ 75%',
         call.message.chat.id, call.message.message_id, reply_markup=dinner_quantity()
 
     )
@@ -352,19 +394,19 @@ def handle_adult_tourist(call):
 @bot.callback_query_handler(func=lambda call: call.data in ['Все включено', 'Завтрак', 'Завтрак и ужин', 'Завтрак, обед и ужин'])
 def handle_days_long(call):
     bot.edit_message_text(
-        'Выберите количество дней\n█████████▒  88%',
+        'Выберите количество ночей\n█████████▒  88%',
         call.message.chat.id, call.message.message_id, reply_markup=days_long()
 
     )
     global eat_plan
     eat_plan = call.data
-    user_data.append(f'План питания -{eat_plan}')
+    user_data.append(f'Тип питания -{eat_plan}')
     return eat_plan
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_days_long'])
 def handle_adult_tourist(call):
     bot.edit_message_text(
-        'Выберите план питания \n███████▒▒▒ 75%',
+        'Выберите Тип питания \n███████▒▒▒ 75%',
         call.message.chat.id, call.message.message_id, reply_markup=dinner_quantity()
 
     )
@@ -384,13 +426,13 @@ def handle_days_long(call):
     )
     global days
     days = call.data
-    user_data.append(f'Количество дней -{days}')
+    user_data.append(f'Количество ночей -{days}')
     return days
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_days_long'])
 def handle_days_long(call):
     bot.edit_message_text(
-        'Выберите количесвто дней\n█████████▒  88%',
+        'Выберите количесвто ночей\n█████████▒  88%',
         call.message.chat.id, call.message.message_id, reply_markup=days_long()
 
     )
@@ -401,7 +443,7 @@ def handle_days_long(call):
 
 #CALLBACK PEDIOD
 
-@bot.callback_query_handler(func=lambda call: call.data in ['янв-фев', 'март-май','июнь-август', 'сент-окт', 'ноябрь-дек'])
+@bot.callback_query_handler(func=lambda call: call.data in ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'])
 def handle_days_long(call):
     bot.edit_message_text(
         f'Все готово!'
@@ -454,27 +496,34 @@ def incorrect(call):
                           reply_markup=start_keyboard())
 
 
+
 user_tg_contacts=[]
 
 @bot.callback_query_handler(func=lambda call: call.data in ['telegram'])
 def telegram(call):
     message = call.message
-    bot.edit_message_text( f'Отправте имя пользователя в телеграм',call.message.chat.id, call.message.message_id)
-    bot.register_next_step_handler(message, username_tg)
+    username_tg_ = message.from_user.first_name
+    user_tg_contacts.append(f'Ник в телеграмме - {username_tg_}')
+    try:
+        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
+                       'adult_persons, children, stars, eat_plan, days, period, user_tg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                       (user_name, departure_city, arrive_city,
+                        adult_persons, children, stars,
+                        eat_plan, days, peiod_, username_tg_))
+        connection.commit()
+        bot.edit_message_text(f'<strong>В ближайшее время с вами свяжется специалист в telegram</strong>',
+                              call.message.chat.id, call.message.message_id, parse_mode='HTML')
+    except NameError:
+        bot.send_message(message.chat.id, f'Произишла ошибка')
 
-    # try:
+
+    user_tg_contacts.clear()
 
 
-
-@bot.callback_query_handler(func=lambda call: call.data in ['whatsapp'])
-def telegram(call):
-    message = call.message
-    bot.edit_message_text( f'Отправте имя пользователя  в whatsapp',call.message.chat.id, call.message.message_id)
-    bot.register_next_step_handler(message, username_whatsapp)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in ['number'])
-def telegram(call):
+def phone_num(call):
     message = call.message
     msg = bot.send_message(message.chat.id, f'\nПоделитесь номером телефона!', reply_markup=get_phone())
 
@@ -498,39 +547,6 @@ def phone_number(message):
 
 
 
-def username_tg(message):
-    username_tg_ = message.text
-    user_tg_contacts.append(f'Ник в телеграмме - {username_tg_}')
-    bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в телеграм '
-                                      f'\n ваш аккаунт-<b>{message.text}</b>', parse_mode='HTML')
-    try:
-        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
-                       'adult_persons, children, stars, eat_plan, days, period, user_tg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                       (user_name, departure_city, arrive_city,
-                        adult_persons, children, stars,
-                        eat_plan, days, peiod_, username_tg_ ))
-        connection.commit()
-    except NameError:
-        bot.send_message(message.chat.id, f'Произишла ошибка')
-
-
-    user_tg_contacts.clear()
-
-def username_whatsapp(message):
-    username_whatsapp_ = message.text
-    user_tg_contacts.append(f'Ник в whatsapp - {username_whatsapp_}')
-    bot.send_message(message.chat.id, f'Специалст свяжется с вами в ближайшее время в whatsapp'
-                                      f'\nваш аккаунт-<b>{message.text}</b>', parse_mode='HTML')
-    try:
-        cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '
-                       'adult_persons, children, stars, eat_plan, days, period, user_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                       (user_name, departure_city, arrive_city,
-                        adult_persons, children, stars,
-                        eat_plan, days, peiod_, username_whatsapp_))
-        connection.commit()
-    except NameError:
-        bot.send_message(message.chat.id, f'Произишла ошибка!')
-    user_tg_contacts.clear()
 
 
 # connection.commit()

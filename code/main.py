@@ -39,7 +39,8 @@ def handle_start(message):
     bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name}'
                                       f'\nЭтот бот поможет тебе подобрать  тур!', reply_markup=start_keyboard())
     global user_name
-    user_name = message.from_user.first_name
+    user_name = f'@{message.from_user.username}'
+
     return user_name
 
 @bot.message_handler(commands=['db'])
@@ -57,6 +58,7 @@ def handle_db(message):
                         user_phone = f'{i[11]}'
                     else:
                         user_phone = f'Не указан'
+
                     bot.send_message(message.chat.id, f'Телеграм пользователя - {i[0]},'
                                                       f'\nГород вылета - {i[1]},'
                                                       f'\nГород прилета - {i[2]}'
@@ -259,7 +261,7 @@ def phone_consult(message):
 @bot.callback_query_handler(func=lambda call: call.data in ['telegram_consult'])
 def handle_tg_consult(call):
     message = call.message
-    username_tg_ = user_name
+    username_tg_ = message.from_user.username
 
     try:
         cursor.execute('INSERT INTO users_consult (user_name, telegram) VALUES (?, ?)', (user_name, username_tg_))
@@ -526,7 +528,7 @@ user_tg_contacts=[]
 @bot.callback_query_handler(func=lambda call: call.data in ['telegram'])
 def telegram(call):
     message = call.message
-    username_tg_ = message.from_user.first_name
+    username_tg_ = message.from_user.username
     user_tg_contacts.append(f'Ник в телеграмме - {username_tg_}')
     try:
         cursor.execute('INSERT INTO users_data (user_name, departure_city, arrive_city, '

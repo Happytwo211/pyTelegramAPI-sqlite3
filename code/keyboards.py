@@ -1,4 +1,12 @@
 from telebot import types
+def test():
+    test = types.InlineKeyboardMarkup()
+    test1 = types.InlineKeyboardButton(
+        'Подобрать тур!', 'https://t.me/Family_Tours_bot'
+
+    )
+    test.add(test1)
+    return test
 def start_keyboard():
     start_keyboard = types.InlineKeyboardMarkup()
     start_keyboard_button_1 = types.InlineKeyboardButton(

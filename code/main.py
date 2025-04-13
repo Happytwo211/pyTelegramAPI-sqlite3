@@ -1,9 +1,10 @@
 import telebot
+import datetime
 from docx import Document
 import sqlite3
 from keyboards import (start_keyboard, departure_cities_keyboard, arrival_cities_keyboard, adult_tourists, kids_tourists,
                             stars_hotel, dinner_quantity, days_long, peiod, yes_or_no_keyboard,
-                            user_contancts, get_phone, consult_kb)
+                            user_contancts, get_phone, consult_kb, test)
 
 from token_ import TOKEN
 
@@ -16,7 +17,22 @@ bot = telebot.TeleBot(TOKEN)
 user_data = []
 
 
+
 #commands
+@bot.message_handler(commands=['send_to_channel'])
+def send_to_channel(message):
+    chat_id = -1002656009361
+    bot.send_photo(chat_id, 'https://imgur.com/a/tQzvvz9',
+                   f'Приветствуем вас на нашем канале! 🌍\n\n'
+                   f'Здесь вы найдете самые интересные и выгодные предложения по турам — от экзотических путешествий до уютных выходных недалеко от дома. Мы поможем вам спланировать идеальный отдых, учитывая все ваши пожелания и бюджет. Подписывайтесь, чтобы быть в курсе новых направлений, акций и специальных предложений!'
+                   f'\n\nПутешествуйте с нами комфортно и выгодно! ✨ ', parse_mode='HTML', reply_markup=test())
+
+    # bot.send_message(chat_id, 'Приветствуем вас на нашем канале! 🌍'
+    #                           '\n\n'
+    #                           'Здесь вы найдете самые интересные и выгодные предложения по турам — от экзотических путешествий до уютных выходных недалеко от дома. Мы поможем вам спланировать идеальный отдых, учитывая все ваши пожелания и бюджет. Подписывайтесь, чтобы быть в курсе новых направлений, акций и специальных предложений!'
+    #                           '\n\n'
+    #                           'Путешествуйте с нами комфортно и выгодно! ✨', parse_mode='HTML',
+    #                  reply_markup=test())
 @bot.message_handler(commands=['help', 'start'])
 def handle_start(message):
 
@@ -376,7 +392,7 @@ def handle_adult_tourist(call):
     )
     global stars
     stars = call.data
-    user_data.append(f'Количесвто звезд - {stars}')
+    user_data.append(f'Количество звезд - {stars}')
     return stars
 
 @bot.callback_query_handler(func=lambda call: call.data in ['main_menu_dinner'])
@@ -520,6 +536,9 @@ def telegram(call):
         bot.send_message(message.chat.id, f'Произишла ошибка')
 
 
+    channel_id = -1002503000438
+    bot.send_message(channel_id, f'В дату базу внесена новая записать\n'
+                                 f'{datetime.date.today()}')
     user_tg_contacts.clear()
 
 
@@ -548,6 +567,9 @@ def phone_number(message):
     except NameError:
         bot.send_message(message.chat.id, f'Произошла ошибка!')
 
+    channel_id = -1002503000438
+    bot.send_message(channel_id, f'В дату базу внесена новая записать\n'
+                                 f'{datetime.date.today()}')
 
 
 

@@ -1,1 +1,1 @@
-TOKEN = '8114806918:AAE1ZiT3kNRhf9YrddAeAJy0zA7gFt3qiA0'
+TOKEN = '//token//'
